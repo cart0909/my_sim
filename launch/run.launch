@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+
+<launch>
+  <arg name="world" default="$(find my_sim)/worlds/test_city.world"/>
+  <arg name="gui" default="true"/>
+  <arg name="args" default=""/>
+  
+  <param name="/use_sim_time" value="true" />
+
+  <node name="gazebo" pkg="gazebo_ros" type="gzserver" args="$(arg world) $(arg args)" respawn="false" output="screen"/>
+  
+  <!-- start gui -->
+  <group if="$(arg gui)">
+    <node name="gazebo_gui" pkg="gazebo_ros" type="gzclient" respawn="false" output="screen"/>
+  </group>
+
+  <!-- Spawn simulated quadrotor uav -->
+  <include file="$(find hector_quadrotor_gazebo)/launch/spawn_quadrotor.launch" >
+    <arg name="model" value="$(find my_sim)/urdf/quadrotor_lvi.gazebo.xacro"/>
+    <arg name="controllers" value="
+        controller/attitude
+        controller/velocity
+        controller/position
+        "/>
+  </include>
+
+  <node name="rviz" pkg="rviz" type="rviz" args="-d $(find my_sim)/rviz/my_sim.rviz" output="log"/>
+</launch>

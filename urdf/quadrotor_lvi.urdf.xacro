@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+
+<robot name="quadrotor" xmlns:xacro="http://www.ros.org/wiki/xacro">
+   
+    <xacro:property name="M_PI" value="3.1415926535897931" />
+    
+    <!-- Included URDF Files -->
+    <xacro:include filename="$(find hector_quadrotor_description)/urdf/quadrotor_base.urdf.xacro" />
+    
+    <!-- Instantiate quadrotor_base_macro once (has no parameters atm) -->
+    <xacro:quadrotor_base_macro />
+    
+    <xacro:include filename="$(find velodyne_description)/urdf/VLP-16.urdf.xacro"/>
+    <VLP-16 parent="base_link" name="velodyne" topic="/velodyne_points" hz="10" samples="440" gpu="true">
+      <origin xyz="0 0 0.05" rpy="0 0 0" />
+    </VLP-16>
+       
+    <!-- vi sensor -->
+    <xacro:include filename="$(find rotors_description)/urdf/component_snippets.xacro" />
+    <xacro:vi_sensor_stereo_camera_macro namespace="vi_sensor" parent_link="base_link" frame_rate="20.0" origin_offset_x="0.26" baseline_y="${0.055*2}" origin_offset_z="-0.06" max_range="30.0">
+    </xacro:vi_sensor_stereo_camera_macro>
+
+</robot>

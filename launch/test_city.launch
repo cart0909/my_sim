@@ -1,0 +1,8 @@
+<?xml version="1.0"?>
+
+<launch>
+  <include file="$(find my_sim)/launch/start.launch">
+   <arg name="world" value="$(find my_sim)/worlds/test_city.world"/> 
+  </include>
+
+</launch>
