@@ -1,0 +1,40 @@
+<?xml version="1.0" ?>
+<launch>
+  <arg name="paused" default="false"/>
+  <arg name="use_sim_time" default="true"/>
+  <arg name="gui" default="true"/>
+  <arg name="headless" default="false"/>
+  <arg name="debug" default="false"/>
+  <arg name="verbose" default="false"/>
+  <arg name="world_name" default="$(find my_sim)/worlds/test_city.world"/>
+  <arg name="world_frame" default="world"/>
+
+  <!-- Start gazebo and load the world -->
+  <include file="$(find gazebo_ros)/launch/empty_world.launch" >
+    <arg name="paused" value="$(arg paused)"/>
+    <arg name="use_sim_time" value="$(arg use_sim_time)"/>
+    <arg name="gui" value="$(arg gui)"/>
+    <arg name="headless" value="$(arg headless)"/>
+    <arg name="debug" value="$(arg debug)"/>
+    <arg name="verbose" value="$(arg verbose)"/>
+    <arg name="world_name" value="$(arg world_name)"/>
+  </include>
+
+  <node name="message_to_tf" pkg="message_to_tf" type="message_to_tf" output="screen">
+    <param name="odometry_topic" value="ground_truth/state" />
+    <param name="frame_id" value="world" />
+  </node>
+
+  <!-- Spawn the example robot -->
+  <arg name="gpu" default="false"/>
+  <param name="robot_description" command="$(find xacro)/xacro --inorder '$(find my_sim)/urdf/virtual_frame.urdf.xacro' world_frame:=$(arg world_frame)" />
+  <node pkg="gazebo_ros" type="spawn_model" respawn="false" name="spawn_model" args="-urdf -param /robot_description -model example"/>
+  <node pkg="robot_state_publisher" type="robot_state_publisher" name="robot_state_publisher">
+    <param name="publish_frequency" type="double" value="30.0" />
+  </node>
+
+  <!-- RViz -->
+  <arg name="rviz" default="true"/>
+  <node if="$(arg rviz)" pkg="rviz" type="rviz" name="$(anon rviz)" respawn="false" output="screen" args="-d $(find velodyne_description)/rviz/example.rviz" />
+
+</launch>
